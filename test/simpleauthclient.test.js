@@ -1,4 +1,4 @@
-let expect = require('chai').use(require("sinon-chai")).expect;
+let expect = require('chai').use(require('sinon-chai')).expect;
 let proxyquire = require('proxyquire');
 let sinon = require('sinon');
 

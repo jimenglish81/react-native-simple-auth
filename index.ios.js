@@ -12,11 +12,23 @@
  */
 'use strict';
 
-let React = require('react-native');
-let simpleAuthClient = require('./lib/simpleauthclient');
-let secrets = require('./secrets');
+import React, {
+  Component,
+  View,
+  Image,
+  Text,
+  TouchableHighlight,
+  ActivityIndicatorIOS,
+  AlertIOS,
+  NavigatorIOS,
+  AppRegistry,
+  StyleSheet
+} from 'react-native';
 
-class Profile extends React.Component {
+import simpleAuthClient from './lib/simpleauthclient';
+import secrets from './secrets';
+
+class Profile extends Component {
 
   constructor(props) {
     super(props);
@@ -27,42 +39,45 @@ class Profile extends React.Component {
   }
 
   render() {
+    let { state, props } = this;
     return (
-      <React.View style={styles.content}>
-        <React.Image style={styles.pic} source={{uri: this.state.picture }} />
-        <React.Text style={styles.header}>{this.state.name}</React.Text>
-        <React.View style={styles.scroll}>
-          <React.Text style={styles.mono}>{JSON.stringify(this.props.info, null, 4)}</React.Text>
-        </React.View>
-      </React.View>
-    )
+      <View style={styles.content}>
+        <Image style={styles.pic} source={{uri: state.picture }} />
+        <Text style={styles.header}>{state.name}</Text>
+        <View style={styles.scroll}>
+          <Text style={styles.mono}>{JSON.stringify(props.info, null, 4)}</Text>
+        </View>
+      </View>
+    );
   }
 
   getName(provider) {
+    let { info } = this.props;
     switch (provider) {
       case 'instagram':
-        return this.props.info.data.full_name;
+        return info.data.full_name;
       case 'linkedin-web':
-        return `${this.props.info.firstName} ${this.props.info.lastName}`;
+        return `${info.firstName} ${info.lastName}`;
       default:
-        return this.props.info.name
+        return info.name;
     }
   }
 
   getPictureLink(provider) {
+    let { info } = this.props;
     switch (provider) {
       case 'google-web':
-        return this.props.info.picture;
+        return info.picture;
       case 'facebook':
-        return `http://graph.facebook.com/${this.props.info.id}/picture?type=square`
+        return `http://graph.facebook.com/${info.id}/picture?type=square`
       case 'twitter':
-        return this.props.info.profile_image_url;
+        return info.profile_image_url;
       case 'instagram':
-        return this.props.info.data.profile_picture;
+        return info.data.profile_picture;
       case 'tumblr':
-        return `http://api.tumblr.com/v2/blog/${this.props.info.name}.tumblr.com/avatar/96`;
+        return `http://api.tumblr.com/v2/blog/${info.name}.tumblr.com/avatar/96`;
       case 'linkedin-web':
-        var profileUrl = `https://api.linkedin.com/v1/people/~:(picture-url)?oauth2_access_token=${this.props.info.token}&format=json`
+        let profileUrl = `https://api.linkedin.com/v1/people/~:(picture-url)?oauth2_access_token=${info.token}&format=json`
         fetch(profileUrl)
           .then(response => response.json())
           .then(responseJson => {
@@ -74,7 +89,7 @@ class Profile extends React.Component {
 
 }
 
-class Login extends React.Component {
+class Login extends Component {
 
   constructor(props) {
     super(props);
@@ -89,23 +104,23 @@ class Login extends React.Component {
 
   render() {
     return (
-      <React.View style={styles.content}>
+      <View style={styles.content}>
         {
-          this.state.loading ? null : this.props.authProviders.map(provider => {
+          this.state.loading ? null : this.props.authProviders.map((provider) => {
             return (
-              <React.TouchableHighlight
+              <TouchableHighlight
                 style={[styles.button, styles[provider]]}
-                onPress={this.onBtnPressed.bind(this, provider)}>
-                <React.Text style={[styles.buttonText]}>{provider.split('-')[0]}</React.Text>
-              </React.TouchableHighlight>
+                onPress={() => this.onBtnPressed(provider)}>
+                <Text style={[styles.buttonText]}>{[provider.split('-')]}</Text>
+              </TouchableHighlight>
             );
           })
         }
-        <React.ActivityIndicatorIOS
+        <ActivityIndicatorIOS
             animating={this.state.loading}
             style={[styles.loading]}
             size='large' />
-      </React.View>
+      </View>
     );
   }
 
@@ -114,21 +129,21 @@ class Login extends React.Component {
       loading: true
     });
     simpleAuthClient.authorize(provider)
-      .then(info => {
+      .then((info) => {
         this.props.navigator.push({
           title: provider,
           component: Profile,
           passProps: {
-            info: info,
-            provider: provider
+            info,
+            provider
           }
         });
         this.setState({
           loading: false
         });
       })
-      .catch(error => {
-          React.AlertIOS.alert(
+      .catch((error) => {
+          AlertIOS.alert(
               'Authorize Error',
               error && error.description || 'Unknown');
         this.setState({
@@ -139,10 +154,11 @@ class Login extends React.Component {
 
 }
 
-class ReactNativeSimpleAuth extends React.Component {
+class ReactNativeSimpleAuth extends Component {
+
   render() {
     return (
-      <React.NavigatorIOS
+      <NavigatorIOS
         style={styles.container}
         initialRoute={{
           title: 'Simple Auth',
@@ -162,7 +178,7 @@ class ReactNativeSimpleAuth extends React.Component {
   }
 }
 
-let styles = React.StyleSheet.create({
+let styles = StyleSheet.create({
   text: {
     color: 'black',
     backgroundColor: 'white',
@@ -238,4 +254,4 @@ let styles = React.StyleSheet.create({
   }
 });
 
-React.AppRegistry.registerComponent('ReactNativeSimpleAuth', () => ReactNativeSimpleAuth);
+AppRegistry.registerComponent('ReactNativeSimpleAuth', () => ReactNativeSimpleAuth);

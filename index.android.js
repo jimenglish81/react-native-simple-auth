@@ -3,6 +3,7 @@
  * https://github.com/facebook/react-native
  */
 'use strict';
+
 import React, {
   AppRegistry,
   Component,
@@ -19,7 +20,7 @@ class reactNativeSimpleAuth extends Component {
           Welcome to React Native!
         </Text>
         <Text style={styles.instructions}>
-          To get started, edit index.android.js
+          HEEELO
         </Text>
         <Text style={styles.instructions}>
           Shake or press menu button for dev menu

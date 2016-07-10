@@ -21,10 +21,6 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
-*.xcworkspace
-project.pbxproj
-Podfile.lock
-Pods
 
 # Android/IJ
 #
@@ -36,10 +32,3 @@ local.properties
 #
 node_modules/
 npm-debug.log
-
-
-.idea
-docs
-.travis/deploy_key
-.travis/deploy_key.pem
-.travis/deploy_key.pub

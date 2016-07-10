@@ -1,67 +1,41 @@
 package com.reactnativesimpleauth;
 
+import android.widget.Toast;
 import org.brickred.socialauth.android.SocialAuthAdapter;
 import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 import org.brickred.socialauth.android.SocialAuthError;
 
-import com.facebook.common.logging.FLog;
-import com.facebook.react.bridge.*;
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.NativeModule;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
 
-public class SocialAuthBridge extends ReactContextBaseJavaModule implements LifecycleEventListener {
+import java.util.Map;
 
-    private SocialAuthAdapter adapter;
+public class SocialAuthBridge extends ReactContextBaseJavaModule {
 
-    public SocialAuthBridge(ReactApplicationContext reactContext) {
-        super(reactContext);
-    }
+  private SocialAuthAdapter adapter = new SocialAuthAdapter(new ResponseListener());
 
-    @Override
-    public String getName() {
-        return "SocialAuthBridge";
-    }
+  public SocialAuthBridge(ReactApplicationContext reactContext) {
+    super(reactContext);
+  }
 
-    @ReactMethod
-    public void configure(String provider, Map<String,Object>config, Callback callback) {
-        SimpleAuth.configuration[provider] = config;
-        callback(provider);
-    }
+  @Override
+  public String getName() {
+    return "SocialAuthBridge";
+  }
 
-    @ReactMethod
-    public void authorize(String provider, Callback callback) {
-        adapter = new SocialAuthAdapter(new ResponseListener());
-        adapter.authorize(this, provider)
-        callback(provider);
-    }
+  @ReactMethod
+  public void configure(String provider, Map<String,Object>config, Callback callback) {
+    //SimpleAuth.configuration[provider] = config;
+    callback.invoke(provider);
+  }
 
-    @ReactMethod
-    public void show(ReadableMap options) throws Exception {
-      adapter = new SocialAuthAdapter(new ResponseListener());
-
-      //TODO - figure out what to replace drawbable with?
-      adapter.addProvider(Provider.TWITTER, R.drawable.twitter);
-      adapter.addProvider(Provider.LINKEDIN, R.drawable.linkedin);
-
-      //adapter.authorize(MainActivity.this, Provider.LINKEDIN);
-      // For twitter use add callback method. Put your own callback url here.
-      //  adapter.addCallBack(Provider.TWITTER,
-      //          "http://socialauth.in/socialauthdemo/socialAuthSuccessAction.do");
-
-       // Add keys and Secrets
-      //  try {
-      //      adapter.addConfig(Provider.FACEBOOK, "297841130364674",
-      //              "dc9c59d0c72d4f2533580e80ba4c2a59", null);
-      //      adapter.addConfig(Provider.TWITTER, "5jwyYJia583EEczmdAmlOA",
-      //              "j0rQkJjTjwVdv7HFiE4zz2qKJKzqjksR2aviVU8fSc", null);
-      //      adapter.addConfig(Provider.LINKEDIN, "bh82t52rdos6",
-      //              "zQ1LLrGbhDZ36fH8", null);
-      //  } catch (Exception e) {
-      //      e.printStackTrace();
-      //  }
-      //  adapter.enable(bar);
-    }
-
-    // @Override
-    // public void onError(SocialAuthError error) {
-    //     //Log.d("ShareButton", "Authentication Error: " + error.getMessage());
-    // }
+  @ReactMethod
+  public void authorize(String provider, Callback callback) {
+    adapter.authorize(getActivity(), provider);
+    callback.invoke(provider);
+  }
 }
